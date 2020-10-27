@@ -23,12 +23,16 @@ let STYLE = document.createElement('style');
 STYLE.appendChild(document.createTextNode(`:host {
 		display: block;
 	}
+	ul {
+		margin: 0;
+	}
 	:host,
 	* {
 		outline: none;
-		font-family:  Helvetica, sans-serif;
+		font-family: Helvetica, sans-serif;
 	}
-	.folder {
+	.folder,
+	li {
 		list-style-type: none;
 		margin-left: -20px;
 	}
@@ -37,6 +41,14 @@ STYLE.appendChild(document.createTextNode(`:host {
 	}
 	.extension {
 		color: gray;
+		display: none;
+	}
+	.icon {
+		text-transform: uppercase;
+		font-weight: bold;
+		color: silver;
+		font-size: 8px;
+		margin-right: 5px;
 	}
 	.file:hover {
 		color: lime;
@@ -115,7 +127,7 @@ import FS from '../fs.js';
 			this.render(folder).then(x => this.$view = x);
 		}
 		fileName(name) {
-			return `<span class='name'>${name.split('.').slice(0, -1).join('.')}</span><span class='extension'>${name.split('.').slice(-1)[0]}</span>`;
+			return `<span class='icon'>${name.split('.').slice(-1)[0]}</span><span class='name'>${name.split('.').slice(0, -1).join('.')}</span><span class='extension'>${name.split('.').slice(-1)[0]}</span>`;
 		}
 		async render(handle) {
 			let folder = await FS.loadFolder(handle);
