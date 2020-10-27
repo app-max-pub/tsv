@@ -1,0 +1,51 @@
+<a id='load'>open folder</a>
+<table>
+	<tr>
+		<td>
+			<file-tree></file-tree>
+		</td>
+		<td>
+			<edit-table></edit-table>
+		</td>
+	</tr>
+</table>
+<style>
+	td {
+		vertical-align: top;
+	}
+
+	/* file-tree{background: #333;} */
+</style>
+
+<script type='module'>
+	import FS from './fs.js';
+	import './dist/edit-table.tag.js';
+	import './dist/file-tree.tag.js';
+	let file = null;
+
+	let table = document.querySelector('edit-table');
+	table.addEventListener('change', event => {
+		console.log('save', file, event.detail)
+		FS.saveFile(file, event.detail)
+	})
+
+	let tree = document.querySelector('file-tree');
+	tree.addEventListener('file', async event => {
+		file = event.detail;
+		console.log('load', file);
+		table.textContent = await FS.loadFile(file);
+		// console.log('text', await FS.loadFile(file))
+	})
+	const link = document.getElementById('load');
+	link.addEventListener('click', async () => {
+		const folder = await window.showDirectoryPicker();
+		tree.folder = folder;
+		// let list = await FS.loadFolder(folder);
+		// console.log('list', list);
+		// console.log('readme', list['README.md'])
+		return;
+
+
+		// FS.saveFile(list['README.md'], 'jo man was geht')
+	});
+</script>

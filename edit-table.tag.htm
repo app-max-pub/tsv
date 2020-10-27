@@ -1,0 +1,63 @@
+<script>
+	class {
+		$onReady() {
+			this.$view.addEventListener('input', event => {
+				console.log('change', event)
+			})
+			// this.$view.addEventListener('focusin', event => {
+			// 	console.log('focus', event)
+			// })
+			this.$view.addEventListener('focusout', event => {
+				// console.log('blur', event)
+				// this.textContent = this.data.map(x => x.join('\t')).join('\n')
+				this.textContent = this.$view.Q('tr').map(tr => tr.Q('td').map(td => td.textContent).join('\t')).join('\n')
+				this.$event('change', this.textContent)
+			})
+		}
+		$onDataChange() {
+			let tsv = this.textContent
+			// console.log('change', tsv);
+			this.data = tsv.split('\n').filter(x => x.trim()).map(x => x.trim().split('\t'))
+			// console.log('data', this.data)
+			let maxLen = Math.max(...this.data.map(x => x.length));
+			// console.log('maxlen', maxLen);
+			this.data = this.data.map(x => [...x, ...Array(maxLen - x.length).fill('')])
+			this.showData();
+		}
+		showData() {
+			let htm = `<table contenteditable='true'>`;
+			for (let row of this.data) {
+				htm += `<tr>`;
+				for (let cell of row) {
+					htm += `<td>${cell}</td>`;
+				}
+				htm += `</tr>`;
+			}
+			htm += `</table>`;
+			this.$view = htm;
+		}
+	}
+</script>
+
+<style>
+	:host {
+		display: block;
+	}
+	*{
+		font-family: 'Courier New', Courier, monospace;
+	}
+	:host,
+	table {
+		outline: none;
+		border: none;
+	}
+
+	table {
+		border-collapse: collapse;
+	}
+
+	td {
+		border: 1px solid silver;
+		padding: 3px;
+	}
+</style>

@@ -1,0 +1,76 @@
+<script>
+	import FS from '../fs.js';
+	class {
+		$onReady() {
+			this.$view.addEventListener('click', event => {
+				let li = event.target.closest('li');
+				// console.log('li', li)
+				let number = li.getAttribute('number');
+				// console.log('num', number)
+				let handle = this.list[number - 1];
+				if (!handle) return;
+				console.log('handle', handle)
+				this.$event('file', handle)
+			})
+		}
+		set folder(folder) {
+			// this.#folder = folder;
+			this.list = [];
+			this.render(folder).then(x => this.$view = x);
+		}
+		fileName(name) {
+			return `<span class='name'>${name.split('.').slice(0, -1).join('.')}</span><span class='extension'>${name.split('.').slice(-1)[0]}</span>`;
+		}
+		async render(handle) {
+			let folder = await FS.loadFolder(handle);
+			let htm = `<details open>`;
+			htm += `<summary>${handle.name}</summary>`;
+			htm += `<ul>`;
+			for (let item of folder) {
+				if (item.name == '.git') continue;
+				// if(!item.name.endsWith('.tsv')) continue;
+				this.list.push(item);
+				if (item.kind == 'file')
+					if (item.name.endsWith('.tsv'))
+						htm += `<li class='file' number='${this.list.length}'>${this.fileName(item.name)}</li>`
+				if (item.kind == 'directory')
+					htm += `<li class='folder'>${await this.render(item)}</li>`;
+			}
+			htm += `</ul>`;
+			htm += `</details>`;
+			return htm;
+		}
+
+	}
+</script>
+
+<style>
+	:host {
+		display: block;
+	}
+
+	:host,
+	* {
+		outline: none;
+		font-family:  Helvetica, sans-serif;
+	}
+
+	.folder {
+		list-style-type: none;
+		margin-left: -20px;
+	}
+
+	.extension::before {
+		content: "."
+	}
+
+	.extension {
+		color: gray;
+
+	}
+
+	.file:hover {
+		color: lime;
+		cursor: pointer;
+	}
+</style>
