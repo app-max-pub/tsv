@@ -63,8 +63,10 @@
 		// DATA.heinz = { name: 'walter' }
 		// console.log('nach',DATA.heinz.name)
 		// setTimeout(() => DATA.heinz.birth = '2020', 500)
-		DATA.delete('heinz5')
-
+		// DATA.delete('heinz5')
+		// DATA.clear();
+		DATA.keys().map(key => console.log('IDBKV', key, DATA[key]))
+		// console.log('keys',DATA.keys())
 		document.getElementById('load').addEventListener('click', async () => {
 			const folder = await window.showDirectoryPicker();
 			DATA.folder = folder;
