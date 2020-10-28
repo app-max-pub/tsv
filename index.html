@@ -43,63 +43,82 @@
 </style>
 
 
-<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+<!-- <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script> -->
 <script type='module'>
+
 	navigator.serviceWorker.register('sw.js');
 	import FS from './fs.js';
 	import './dist/edit-table.tag.js';
 	import './dist/file-tree.tag.js';
-	let file = null;
+
 	let tree = document.querySelector('file-tree');
-
-
-	var db = new Dexie("FS");
-	db.version(1).stores({
-		folders: 'name,handle'
-	});
-
-
-
-	const link = document.getElementById('load');
-	link.addEventListener('click', async () => {
-		const folder = await window.showDirectoryPicker();
-		// localStorage.setItem('folder', folder);
-		db.folders.clear();
-		db.folders.put({ name: folder.name, handle: folder })
-		console.log('folder', folder);
-
-		tree.folder = folder;
-		// let list = await FS.loadFolder(folder);
-		// console.log('list', list);
-		// console.log('readme', list['README.md'])
-		return;
-		// FS.saveFile(list['README.md'], 'jo man was geht')
-	});
-
-	const recent = document.getElementById('recent');
-	recent.addEventListener('click', async () => {
-		// let folder = localStorage.getItem('folder');
-		// console.log('old folder', folder);
-		let folders = await db.folders.toArray()
-		console.log('last', folders)
-		FS.verifyPermission(folders[0].handle);
-		tree.folder = folders[0].handle;
-	});
-
-
 	let table = document.querySelector('edit-table');
-	table.addEventListener('change', event => {
-		console.log('save', file, event.detail)
-		FS.saveFile(file, event.detail)
-	})
+
+	import IDBKV from './idbkv.js';
+	IDBKV.then(DATA => {
+		// console.log('5',DATA.heinz5)
+		// DATA.heinz5 = { name: 'walter5' }
+		// console.log('save now')
+		// DATA.heinz2 = { name: 'walter3' }
+		// DATA.heinz = { name: 'walter' }
+		// console.log('nach',DATA.heinz.name)
+		// setTimeout(() => DATA.heinz.birth = '2020', 500)
+
+		document.getElementById('load').addEventListener('click', async () => {
+			const folder = await window.showDirectoryPicker();
+			DATA.folder = folder;
+			// db.folders.clear();
+			// db.folders.put({ name: folder.name, handle: folder })
+			console.log('folder', folder);
+
+			tree.folder = folder;
+		});
+
+		document.getElementById('recent').addEventListener('click', async () => {
+			// let folder = localStorage.getItem('folder');
+			// console.log('old folder', folder);
+			// let folders = await db.folders.toArray()
+			// let folder = DATA.folder
+			console.log('last', DATA.folder, DATA.file)
+			FS.verifyPermission(DATA.folder);
+			tree.folder = DATA.folder;
+			// console.log('try file now')
+			// FS.verifyPermission(DATA.file);
+			// table.textContent = await FS.loadFile(DATA.file);
+		});
 
 
-	tree.addEventListener('file', async event => {
-		file = event.detail;
-		localStorage.setItem('file', file);
-		console.log('load', file);
-		table.textContent = await FS.loadFile(file);
-		// console.log('text', await FS.loadFile(file))
+		table.addEventListener('change', event => {
+			console.log('save', DATA.file, event.detail)
+			FS.saveFile(DATA.file, event.detail)
+		})
+
+
+		tree.addEventListener('file', async event => {
+			DATA.file = event.detail;
+			// localStorage.setItem('file', file);
+			console.log('load', DATA.file);
+			table.textContent = await FS.loadFile(DATA.file);
+			// console.log('text', await FS.loadFile(file))
+		})
+
 	})
+
+	// DATA.save();
+	// let file = null;
+
+
+
+	// var db = new Dexie("FS");
+	// db.version(1).stores({
+	// 	folders: 'name,handle'
+	// });
+
+
+
+
+
+
+
 
 </script>
