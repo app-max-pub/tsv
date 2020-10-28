@@ -4,43 +4,46 @@
 // log(DB.heinz.nachname)
 // 
 
-let request = window.indexedDB.open('IDBKV', 1);
-let storeName = 'store'
+let REQ = window.indexedDB.open('IDBKV', 1);
+// let storeName = 'store'
 
-request.onerror = event => console.error('IDBKV error', event);
+// request.onerror = event => console.error('IDBKV error', event);
 
 
-let DB = null;
+// let DB = null;
 const IDB = new Promise((resolve, reject) => {
 	// let STORE = null;
-	request.onsuccess = event => {
+	REQ.onsuccess = event => {
 		// console.log('DB.ready');
-		DB = event.target.result;
-		resolve(DB)
+		// DB = event.target.result;
+		resolve(event.target.result)
 	}
-	request.onupgradeneeded = event => {
+	REQ.onupgradeneeded = event => {
 		// console.log('DB.upgrade');
 		DB = event.target.result;
-		DB.createObjectStore(storeName);
-		event.target.transaction.oncomplete = () => resolve(DB);
+		DB.createObjectStore('store');
+		event.target.transaction.oncomplete = e => resolve(DB);
 	}
 })
-
+// await Promise.resolve();
 
 // function store(DB,name){
 
 // }
+let OS = (DB, storeName) => DB.transaction([storeName], "readwrite").objectStore(storeName)
+
 function save(DB, store, key, val) {
-	if (typeof val == 'function') return;
+
 	// console.log("save", DB, store, key, val)
-	DB.transaction([store], "readwrite").objectStore(store).put(val, key).onsuccess = function (event) {
-		console.log('IDBKV saved', event.target.result)
-		// event.target.result === customer.ssn;
-	};
+	OS(DB, store).put(val, key)
+	// .onsuccess = function (event) {
+	// 	console.log('IDBKV saved', event.target.result)
+	// 	// event.target.result === customer.ssn;
+	// };
 }
 async function loadAll(DB, store) {
 	return new Promise((resolve, reject) => {
-		DB.transaction([store], "readwrite").objectStore(store).getAllKeys().onsuccess = async function (event) {
+		OS(DB, store).getAllKeys().onsuccess = async function (event) {
 			let out = {};
 			for (let key of event.target.result)
 				out[key] = await load(DB, store, key);
@@ -50,7 +53,7 @@ async function loadAll(DB, store) {
 }
 function load(DB, store, key) {
 	return new Promise((resolve, reject) => {
-		DB.transaction([store], "readwrite").objectStore(store).get(key).onsuccess = function (event) {
+		OS(DB, store).get(key).onsuccess = function (event) {
 			resolve(event.target.result);
 		};
 	});
@@ -60,25 +63,34 @@ function load(DB, store, key) {
 export default IDB.then(DB => new Promise(async (resolve, reject) => {
 	// console.log("IDBKV ready", DB)
 	let all = await loadAll(DB, 'store')
-	console.log('IDBKV data', all);
+	// console.log('IDBKV data', all);
 	// for (let key in all)
 	// 	DATA[key] = all[key];
 	let DATA = new Proxy(all, {
 		set: (target, key, value) => {
 			let out = Reflect.set(target, key, value);
-			save(DB, 'store', key, value);
+			if (typeof value != 'function')
+				// OS(DB, 'store').put(value, key)
+				DATA.save(key);
+			// save(DB, 'store', key, value);
 			return out;
 		},
 	})
 
-	DATA.save = function (key) {
-		console.log("SAVE", DB, key)
-		if (key)
-			save(DB, 'store', key, DATA[key])
-		else
-			for (let key in DATA)
-				save(DB, 'store', key, DATA[key])
-	}
+	DATA.save = key => OS(DB, 'store').put(DATA[key], key)
+	DATA.saveAll = () => Object.keys(DATA).map(DATA.save)
+	DATA.delete = key => OS(DB, 'store').delete(key)
+	// {
+	// 	// console.log("SAVE", DB, key)
+	// 	if (key)
+	// 		save(DB, 'store', key, DATA[key])
+	// 	else
+	// 		for (let key in DATA)
+	// 			save(DB, 'store', key, DATA[key])
+	// }
+	// DATA.save = key =>
+
+
 	resolve(DATA);
 }));
 
