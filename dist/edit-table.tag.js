@@ -109,10 +109,11 @@ class WebTag extends HTMLElement {
 class edit_table extends WebTag {
 		$onReady() {
 			this.$view.addEventListener('input', event => {
-				console.log('change', event)
 			})
 			this.$view.addEventListener('focusout', event => {
-				this.textContent = this.$view.Q('tr').map(tr => tr.Q('td').map(td => td.textContent).join('\t')).join('\n')
+				let tsv = this.$view.Q('tr').map(tr => tr.Q('td').map(td => td.textContent).join('\t')).join('\n');
+				if (tsv == this.textContent) return console.log('no changes');
+				this.textContent = tsv
 				this.$event('change', this.textContent)
 			})
 		}

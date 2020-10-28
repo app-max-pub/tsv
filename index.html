@@ -54,8 +54,16 @@
 	let tree = document.querySelector('file-tree');
 	let table = document.querySelector('edit-table');
 
-	import IDBKV from './idbkv.js';
-	IDBKV.then(DATA => {
+
+	import DB from './idbkv2.js';
+	(async function () {
+		DB.dude = 'jo';
+		console.log("keys", await DB.keys);
+		console.log("file", await DB.file);
+	// })()
+
+	// import IDBKV from './idbkv.js';
+	// IDBKV.then(DATA => {
 		// console.log('5',DATA.heinz5)
 		// DATA.heinz5 = { name: 'walter5' }
 		// console.log('save now')
@@ -65,11 +73,11 @@
 		// setTimeout(() => DATA.heinz.birth = '2020', 500)
 		// DATA.delete('heinz5')
 		// DATA.clear();
-		DATA.keys().map(key => console.log('IDBKV', key, DATA[key]))
+		(await DB.keys).map(async key => console.log('IDBKV', key, await DB[key]))
 		// console.log('keys',DATA.keys())
 		document.getElementById('load').addEventListener('click', async () => {
 			const folder = await window.showDirectoryPicker();
-			DATA.folder = folder;
+			DB.folder = folder;
 			// db.folders.clear();
 			// db.folders.put({ name: folder.name, handle: folder })
 			console.log('folder', folder);
@@ -82,31 +90,31 @@
 			// console.log('old folder', folder);
 			// let folders = await db.folders.toArray()
 			// let folder = DATA.folder
-			console.log('last', DATA.folder, DATA.file)
-			FS.verifyPermission(DATA.folder);
-			tree.folder = DATA.folder;
+			console.log('last', await DB.folder)
+			FS.verifyPermission(await DB.folder);
+			tree.folder = await DB.folder;
 			// console.log('try file now')
 			// FS.verifyPermission(DATA.file);
 			// table.textContent = await FS.loadFile(DATA.file);
 		});
 
 
-		table.addEventListener('change', event => {
-			console.log('save', DATA.file, event.detail)
-			FS.saveFile(DATA.file, event.detail)
+		table.addEventListener('change', async event => {
+			console.log('save', await DB.file, event.detail)
+			FS.saveFile(await DB.file, event.detail)
 		})
 
 
 		tree.addEventListener('file', async event => {
-			DATA.file = event.detail;
+			DB.file = event.detail;
 			// localStorage.setItem('file', file);
-			console.log('load', DATA.file);
-			table.textContent = await FS.loadFile(DATA.file);
+			// console.log('load', await DB.file);
+			table.textContent = await FS.loadFile(await DB.file);
 			// console.log('text', await FS.loadFile(file))
 		})
 
-	})
-
+	// })
+})()
 	// DATA.save();
 	// let file = null;
 

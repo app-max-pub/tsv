@@ -119,7 +119,6 @@ import FS from '../fs.js';
 				let number = li.getAttribute('number');
 				let handle = this.list[number - 1];
 				if (!handle) return;
-				console.log('handle', handle)
 				this.$event('file', handle)
 			})
 		}

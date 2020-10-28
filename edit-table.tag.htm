@@ -2,7 +2,7 @@
 	class {
 		$onReady() {
 			this.$view.addEventListener('input', event => {
-				console.log('change', event)
+				// console.log('change', event)
 			})
 			// this.$view.addEventListener('focusin', event => {
 			// 	console.log('focus', event)
@@ -10,7 +10,9 @@
 			this.$view.addEventListener('focusout', event => {
 				// console.log('blur', event)
 				// this.textContent = this.data.map(x => x.join('\t')).join('\n')
-				this.textContent = this.$view.Q('tr').map(tr => tr.Q('td').map(td => td.textContent).join('\t')).join('\n')
+				let tsv = this.$view.Q('tr').map(tr => tr.Q('td').map(td => td.textContent).join('\t')).join('\n');
+				if (tsv == this.textContent) return console.log('no changes');
+				this.textContent = tsv
 				this.$event('change', this.textContent)
 			})
 		}
