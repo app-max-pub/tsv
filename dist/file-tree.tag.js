@@ -53,7 +53,8 @@ STYLE.appendChild(document.createTextNode(`:host {
 	.file:hover {
 		color: lime;
 		cursor: pointer;
-	}`));
+	}
+	.tsv{color: orange}`));
 class WebTag extends HTMLElement {
 	constructor() {
 		super();
@@ -126,8 +127,10 @@ import FS from '../fs.js';
 			this.list = [];
 			this.render(folder).then(x => this.$view = x);
 		}
-		fileName(name) {
-			return `<span class='icon'>${name.split('.').slice(-1)[0]}</span><span class='name'>${name.split('.').slice(0, -1).join('.')}</span><span class='extension'>${name.split('.').slice(-1)[0]}</span>`;
+		fileName(p) {
+			let name = p.split('.').slice(0, -1).join('.');
+			let extension = p.split('.').slice(-1)[0]
+			return `<span class='icon ${extension}'>${extension}</span><span class='name'>${name}</span><span class='extension'>${extension}</span>`;
 		}
 		async render(handle) {
 			let folder = await FS.loadFolder(handle);

@@ -23,7 +23,7 @@ let STYLE = document.createElement('style');
 STYLE.appendChild(document.createTextNode(`:host {
 		display: block;
 	}
-	*{
+	* {
 		font-family: 'Courier New', Courier, monospace;
 	}
 	:host,
@@ -37,6 +37,10 @@ STYLE.appendChild(document.createTextNode(`:host {
 	td {
 		border: 1px solid silver;
 		padding: 3px;
+	}
+	td:hover {
+		background: #eee;
+		cursor: pointer;
 	}`));
 function QQ(query, i) {
 	let result = Array.from(this.querySelectorAll(query));
