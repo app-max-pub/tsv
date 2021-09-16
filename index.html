@@ -55,15 +55,18 @@
 	let table = document.querySelector('edit-table');
 
 
-	import DB from './idbkv2.js';
+	// import DB from './idbkv2.js';
+	import DB from 'https://max.pub/idbkv/min.js';
 	(async function () {
 		DB.dude = 'jo';
+		delete DB.dude;
 		console.log("keys", await DB.keys);
+		// console.log("k2", await DB.k2);
 		console.log("file", await DB.file);
-	// })()
+		// })()
 
-	// import IDBKV from './idbkv.js';
-	// IDBKV.then(DATA => {
+		// import IDBKV from './idbkv.js';
+		// IDBKV.then(DATA => {
 		// console.log('5',DATA.heinz5)
 		// DATA.heinz5 = { name: 'walter5' }
 		// console.log('save now')
@@ -113,8 +116,8 @@
 			// console.log('text', await FS.loadFile(file))
 		})
 
-	// })
-})()
+		// })
+	})()
 	// DATA.save();
 	// let file = null;
 
